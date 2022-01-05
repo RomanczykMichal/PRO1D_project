@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import mutual_info_regression
+from sklearn.model_selection import train_test_split
 
 
 def main():
@@ -45,12 +46,9 @@ def prep_data():
     return df_cleaned, df_mean, df_med
 
 
-def prep_dataset(df, target='target'):
-    from xverse.feature_subset import SplitXY
-
-    clf = SplitXY([target])  # Split the dataset into X and y
-    X, y = clf.fit_transform(df)  # returns features (X) dataset and target(Y) as a numpy array
-
+def prep_dataset(df):
+    X = df.iloc[:, :-1]
+    y = df.iloc[:, -1:]
     return X, y
 
 

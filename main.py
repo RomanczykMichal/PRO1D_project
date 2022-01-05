@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from sklearn_pandas import DataFrameMapper
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import f_regression
+from sklearn.feature_selection import mutual_info_regression
 
 def main():
     # Dane oczyszczone przez nas
@@ -25,25 +27,6 @@ def main():
     # utworzenie zmiennych
     X, y = prep_dataset(df_value_columns, target='ViolentCrimesPerPop')
 
-    from sklearn.feature_selection import SelectKBest
-    from sklearn.feature_selection import f_regression
-    from sklearn.feature_selection import mutual_info_regression
-
-
-
-    # define feature selection
-    fs = SelectKBest(score_func=f_regression, k=35)
-    # apply feature selection
-    X_selected = fs.fit_transform(X, y)
-    X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if fs.get_support()[i]])
-    print(X_selected_df.columns)
-
-
-    fs2 = SelectKBest(score_func=mutual_info_regression, k=35)
-    X_selected2 = fs2.fit_transform(X, y)
-    X_selected2_df = pd.DataFrame(X_selected2, columns=[X.columns[i] for i in range(len(X.columns)) if fs2.get_support()[i]])
-    print(X_selected2_df.columns)
-
 
 def prep_dataset(df, target='target'):
     from xverse.feature_subset import SplitXY
@@ -53,6 +36,17 @@ def prep_dataset(df, target='target'):
 
     return X, y
 
+def future_names(X, y):
+    # define feature selection
+    fs = SelectKBest(score_func=f_regression, k=35)
+    # apply feature selection
+    X_selected = fs.fit_transform(X, y)
+    X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if fs.get_support()[i]])
+
+    fs2 = SelectKBest(score_func=mutual_info_regression, k=35)
+    X_selected2 = fs2.fit_transform(X, y)
+    X_selected2_df = pd.DataFrame(X_selected2, columns=[X.columns[i] for i in range(len(X.columns)) if fs2.get_support()[i]])
+    print(X_selected2_df.columns)
 
 if __name__ == '__main__':
     main()

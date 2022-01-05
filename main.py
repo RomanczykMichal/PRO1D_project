@@ -4,15 +4,33 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import mutual_info_regression
 
+
 def main():
+    # zbiory danych
+    df_cleaned, df_mean, df_med = prep_data()
+
+    # utworzenie zmiennych
+    X, y = prep_dataset(df_cleaned)
+    column_names = future_names(X, y)
+
+    # przefiltrowanie kolumn na te najważniejsze, z metody future_names
+    df_cleaned_filtered = df_cleaned[column_names]
+
+
+    # podział na zbiory testowe i treningowe
+    X_train, X_test, y_train, y_test = train_test_split(df_cleaned_filtered, y, test_size=0.25, random_state=5)
+
+
+
+def prep_data():
     # Dane oczyszczone przez nas
     df = pd.read_csv('data/data_cleaned.csv', sep=';')
-    df_value_columns = df.iloc[:, 5:]  # dane z komulnami decyzyjnymi
+    df_cleaned = df.iloc[:, 5:]  # dane z komulnami decyzyjnymi
     df_names = df.iloc[:, :5]  # dane z informacjami o wierszu
 
     # Dane surowe z warotściami wypełonymi średnią
     df_mean = pd.read_csv('data/data.csv', sep=';')
-    df_mean = df_mean.iloc[:,5:]
+    df_mean = df_mean.iloc[:, 5:]
     df_mean = df_mean.replace('?', np.NaN)
     df_mean = df_mean.apply(pd.to_numeric)
     df_mean = df_mean.fillna(df_mean.mean())
@@ -24,8 +42,7 @@ def main():
     df_med = df_med.apply(pd.to_numeric)
     df_med = df_med.fillna(df_med.median())
 
-    # utworzenie zmiennych
-    X, y = prep_dataset(df_value_columns, target='ViolentCrimesPerPop')
+    return df_cleaned, df_mean, df_med
 
 
 def prep_dataset(df, target='target'):
@@ -36,17 +53,21 @@ def prep_dataset(df, target='target'):
 
     return X, y
 
-def future_names(X, y):
-    # define feature selection
-    fs = SelectKBest(score_func=f_regression, k=35)
-    # apply feature selection
-    X_selected = fs.fit_transform(X, y)
-    X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if fs.get_support()[i]])
 
-    fs2 = SelectKBest(score_func=mutual_info_regression, k=35)
-    X_selected2 = fs2.fit_transform(X, y)
-    X_selected2_df = pd.DataFrame(X_selected2, columns=[X.columns[i] for i in range(len(X.columns)) if fs2.get_support()[i]])
-    print(X_selected2_df.columns)
+def future_names(X, y):
+    future_selector = SelectKBest(score_func=f_regression, k=80)
+    X_selected = future_selector.fit_transform(X, y)
+    X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if
+                                                      future_selector.get_support()[i]])
+
+    future_selector2 = SelectKBest(score_func=mutual_info_regression, k=80)
+    X_selected2 = future_selector2.fit_transform(X, y)
+    X_selected2_df = pd.DataFrame(X_selected2, columns=[X.columns[i] for i in range(len(X.columns)) if
+                                                        future_selector2.get_support()[i]])
+
+    selected_features = np.append(X_selected2_df.columns.to_numpy(), X_selected_df.columns.to_numpy())
+    return np.unique(selected_features)
+
 
 if __name__ == '__main__':
     main()

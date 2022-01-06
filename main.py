@@ -8,26 +8,53 @@ from sklearn.model_selection import train_test_split
 
 def main():
     # zbiory danych
-    df_cleaned, df_mean, df_med = prep_data()
+    df_original, df_cleaned, df_mean, df_med = prep_data()
 
     # utworzenie zmiennych
     X, y = prep_dataset(df_cleaned)
     column_names = future_names(X, y)
-
     # przefiltrowanie kolumn na te najważniejsze, z metody future_names
     df_cleaned_filtered = df_cleaned[column_names]
 
-
     # podział na zbiory testowe i treningowe
-    X_train, X_test, y_train, y_test = train_test_split(df_cleaned_filtered, y, test_size=0.25, random_state=5)
+    # Tutaj można podmienić wartość inputs na dowolny dataset
+    inputs = df_mean
+    X_train, X_test, y_train, y_test = train_test_split(inputs.values, y.values, test_size=0.25, random_state=5)
 
+    # siec neuronowa
+    alg.neural_network(X_train, X_test, y_train, y_test)
+
+    # Drzewo regresyjne
+    alg.decision_tree_regressor(X_train, X_test, y_train, y_test)
+
+    # regresja liniowa
+    alg.linear_regression(X_train, X_test, y_train, y_test)
+
+    # regresja nieliniowa
 
 
 def prep_data():
+    """
+    Metoda odpowiedzialna za pobranie i wstępne przygotowanie danych.
+
+    :return
+        df_original -> DataFrame z oryginalnymi wartościami z pliku źródłowego
+        df_cleaned  -> DataFrame bez usuniętymi kolumnami, w których znajdowały
+                       się puste wartości
+        df_mean     -> DataFrame z podmienionymi wartościami na średnią dla danej
+                       wartości, gdzie tych danych brakowało.
+        df_med      -> DataFrame z podmienionymi wartościami na medianę dla danej
+                       wartości, gdzie tych danych brakowało.
+    :
+    """
+
+    # Dane surowe
+    df_original = pd.read_csv('data/data.csv', sep=';')
+    df_original = df_original.iloc[:, 5:]
+
     # Dane oczyszczone przez nas
-    df = pd.read_csv('data/data_cleaned.csv', sep=';')
-    df_cleaned = df.iloc[:, 5:]  # dane z komulnami decyzyjnymi
-    df_names = df.iloc[:, :5]  # dane z informacjami o wierszu
+    df_cleaned = pd.read_csv('data/data_cleaned.csv', sep=';')
+    df_cleaned = df_cleaned.iloc[:, 5:]
 
     # Dane surowe z warotściami wypełonymi średnią
     df_mean = pd.read_csv('data/data.csv', sep=';')
@@ -43,7 +70,7 @@ def prep_data():
     df_med = df_med.apply(pd.to_numeric)
     df_med = df_med.fillna(df_med.median())
 
-    return df_cleaned, df_mean, df_med
+    return df_original, df_cleaned, df_mean, df_med
 
 
 def prep_dataset(df):
@@ -52,16 +79,38 @@ def prep_dataset(df):
     return X, y
 
 
-def future_names(X, y):
-    future_selector = SelectKBest(score_func=f_regression, k=80)
-    X_selected = future_selector.fit_transform(X, y)
-    X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if
-                                                      future_selector.get_support()[i]])
+def future_selector(X, y):
+    """
+    Metoda odpowiedzialna za głosowanie za kolumnami, które posiadają
+    odpowiednią korelację pomiędzy sobą.
 
-    future_selector2 = SelectKBest(score_func=mutual_info_regression, k=80)
-    X_selected2 = future_selector2.fit_transform(X, y)
+    :param X
+        Kolumny z wartosciami input
+    :
+
+    :param y
+        Kolumna z wartoscią decyzyjną
+    :
+
+    :return
+        Nazwy kolumn wybrane w wyniku głosowań.
+    :
+
+    TODO połączyć f_selector i f_selector2 w jedną funkcję, zmienić po prostu score_func.
+         Sprawdzic czy jest mozliwosc po zrobionym juz fit_transform
+
+    TODO ogarnac w ogole co robi fit_transform
+    """
+
+    f_selector = SelectKBest(score_func=f_regression, k=80)
+    X_selected = f_selector.fit_transform(X.values, y.values.ravel())
+    X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if
+                                                      f_selector.get_support()[i]])
+
+    f_selector2 = SelectKBest(score_func=mutual_info_regression, k=80)
+    X_selected2 = f_selector2.fit_transform(X.values, y.values.ravel())
     X_selected2_df = pd.DataFrame(X_selected2, columns=[X.columns[i] for i in range(len(X.columns)) if
-                                                        future_selector2.get_support()[i]])
+                                                        f_selector2.get_support()[i]])
 
     selected_features = np.append(X_selected2_df.columns.to_numpy(), X_selected_df.columns.to_numpy())
     return np.unique(selected_features)

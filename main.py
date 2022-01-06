@@ -4,7 +4,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.model_selection import train_test_split
-
+import algorithms as alg
 
 def main():
     # zbiory danych

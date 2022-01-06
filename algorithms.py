@@ -1,6 +1,7 @@
 from sklearn import linear_model
 from sklearn.neural_network import MLPRegressor
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
 
 
 def neural_network(X_train, X_test, y_train, y_test):
@@ -49,7 +50,14 @@ def linear_regression(X_train, X_test, y_train, y_test):
 
 def non_linear_regression(X_train, X_test, y_train, y_test):
     """
+    Sources:
+        https://scikit-learn.org/stable/auto_examples/svm/plot_svm_regression.html
+        https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html#sklearn.svm.SVR
+        https://www.analyticsvidhya.com/blog/2020/03/support-vector-regression-tutorial-for-machine-learning/
+
+        TODO dodalem to, ale nie mam pojecia czy to jest w ogole to XD Z tego co przeczytalem
+             w tych artykulach to niby powinno sie zgadzac
     """
-
-
-    print('Non-Linear regression score:')
+    model_r = SVR()
+    model_r.fit(X_train, y_train)
+    print('Non-Linear regression score:', model_r.score(X_test, y_test))

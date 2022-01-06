@@ -12,14 +12,16 @@ def main():
 
     # utworzenie zmiennych
     X, y = prep_dataset(df_cleaned)
-    column_names = future_names(X, y)
+    column_names = future_selector(X, y)
     # przefiltrowanie kolumn na te najważniejsze, z metody future_names
     df_cleaned_filtered = df_cleaned[column_names]
 
     # podział na zbiory testowe i treningowe
     # Tutaj można podmienić wartość inputs na dowolny dataset
-    inputs = df_mean
+    inputs = df_cleaned
     X_train, X_test, y_train, y_test = train_test_split(inputs.values, y.values, test_size=0.25, random_state=5)
+    y_train = y_train.ravel()
+    y_test = y_test.ravel()
 
     # siec neuronowa
     alg.neural_network(X_train, X_test, y_train, y_test)
@@ -31,6 +33,7 @@ def main():
     alg.linear_regression(X_train, X_test, y_train, y_test)
 
     # regresja nieliniowa
+    alg.non_linear_regression(X_train, X_test, y_train, y_test)
 
 
 def prep_data():

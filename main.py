@@ -14,7 +14,7 @@ def main():
     X, y = prep_dataset(df_cleaned)
     column_names = future_selector(X, y)
     # przefiltrowanie kolumn na te najważniejsze, z metody future_names
-    df_cleaned_filtered = df_cleaned[column_names]
+    # df_cleaned_filtered = df_cleaned[column_names]
 
     # podział na zbiory testowe i treningowe
     # Tutaj można podmienić wartość inputs na dowolny dataset
@@ -24,7 +24,7 @@ def main():
     y_test = y_test.ravel()
 
     # siec neuronowa
-    alg.neural_network(X_train, X_test, y_train, y_test)
+    alg.neural_network(X_train, X_test, y_train, y_test, X, y)
 
     # Drzewo regresyjne
     alg.decision_tree_regressor(X_train, X_test, y_train, y_test)

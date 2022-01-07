@@ -2,9 +2,10 @@ from sklearn import linear_model
 from sklearn.neural_network import MLPRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.svm import SVR
+from sklearn.model_selection import cross_val_score
 
 
-def neural_network(X_train, X_test, y_train, y_test):
+def neural_network(X_train, X_test, y_train, y_test, X, y):
     """
     Sources:
         https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor
@@ -17,11 +18,16 @@ def neural_network(X_train, X_test, y_train, y_test):
         TODO Dla max_iter=1000 wartość się zwiększa do ~0.99
              Dla max_iter=500  wartosc wynosi ~0.83
              Trzeba się zastanowić jak bardzo chcemy szkolić naszą sieć, żeby nie była przetrenowana
+
+        scores - tablica wyników z cross-validation.
+        cross_val_model - cv=5 to tyle razy odpalane jest uczenie.
     """
-    model_r = MLPRegressor(random_state=5, hidden_layer_sizes=(22,), activation='logistic', alpha=0.0001,
-                           learning_rate_init=0.0001, solver='adam', max_iter=500, early_stopping=True, verbose=False)
+    model_r = MLPRegressor(random_state=5, hidden_layer_sizes=(50), activation='logistic', alpha=0.0001,
+                           learning_rate_init=0.0001, solver='adam', max_iter=500, early_stopping=True, verbose=True)
     model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values, cv=5)
     print('Neural network score:', model_r.score(X_test, y_test))
+    print('Neural network cross-validation mean score is: ', scores.mean(), scores.std())
 
 
 def decision_tree_regressor(X_train, X_test, y_train, y_test):
@@ -43,7 +49,7 @@ def linear_regression(X_train, X_test, y_train, y_test):
 
         TODO dlaczego alpha 35?
     """
-    model_r = linear_model.Ridge(alpha=35)
+    model_r = linear_model.Ridge(alpha=1)
     model_r.fit(X_train, y_train)
     print('Linear regression score:', model_r.score(X_test, y_test))
 

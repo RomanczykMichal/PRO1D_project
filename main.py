@@ -101,12 +101,7 @@ def future_selector(X, y):
         Nazwy kolumn wybrane w wyniku głosowań.
     :
 
-    TODO połączyć f_selector i f_selector2 w jedną funkcję, zmienić po prostu score_func.
-         Sprawdzic czy jest mozliwosc po zrobionym juz fit_transform
-
     TODO ogarnac w ogole co robi fit_transform
-
-    TODO pobawic sie z wartoscia k
     """
 
     f_selector = SelectKBest(score_func=f_regression, k=30)

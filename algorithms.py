@@ -18,13 +18,12 @@ def neural_network(X_train, X_test, y_train, y_test, X, y):
         scores - tablica wyników z cross-validation.
         cross_val_model - cv=5 to tyle razy odpalane jest uczenie.
     """
-    model_r = MLPRegressor(hidden_layer_sizes=(22,), activation='logistic', alpha=0.0001, learning_rate_init=0.0001,
-                           solver='adam', max_iter=2000, early_stopping=True, verbose=False)
+    model_r = MLPRegressor(hidden_layer_sizes=(20,), activation='logistic', alpha=0.1, learning_rate_init=0.1,
+                           learning_rate='adaptive', solver='sgd', max_iter=10000, early_stopping=True, verbose=False)
     model_r.fit(X_train, y_train)
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
 
-    print('\nNeural network score:', model_r.score(X_test, y_test))
-    metrics.plot_roc_curve(model_r, X_test, y_test)
+    print('Neural network score:', model_r.score(X_test, y_test))
     print('Neural network cross-validation mean score is: ', scores.mean(), scores.std())
 
 
@@ -40,7 +39,6 @@ def decision_tree_regressor(X_train, X_test, y_train, y_test, X, y):
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
 
     print('\nDecision tree regressor score:', model_r.score(X_test, y_test))
-    metrics.plot_roc_curve(model_r, X_test, y_test)
     print('Decision tree cross-validation mean score is: ', scores.mean(), scores.std())
 
     # plt.figure()
@@ -61,7 +59,6 @@ def linear_regression(X_train, X_test, y_train, y_test, X, y):
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
 
     print('\nLinear regression score:', model_r.score(X_test, y_test))
-    metrics.plot_roc_curve(model_r, X_test, y_test)
     print('Linear regression cross-validation mean score is: ', scores.mean(), scores.std())
 
 
@@ -80,5 +77,4 @@ def non_linear_regression(X_train, X_test, y_train, y_test, X, y):
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
 
     print('\nNon-Linear regression score:', model_r.score(X_test, y_test))
-    metrics.plot_roc_curve(model_r, X_test, y_test)
     print('Non-Linear regression cross-validation mean score is: ', scores.mean(), scores.std())

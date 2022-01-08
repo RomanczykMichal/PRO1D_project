@@ -13,29 +13,35 @@ def main():
 
     # future selector
     X_temp, y_temp = prep_dataset(df_cleaned)
-    column_names = future_selector(X_temp, y_temp)
+    column_names = feature_selector(X_temp, y_temp)
+    column_names = np.append(column_names, 'ViolentCrimesPerPop')
     df_cleaned_filtered = df_cleaned[column_names]
 
-    # inicjacja X i y
-    inputs = df_cleaned_filtered
-    X, y = prep_dataset(inputs)
+    data_sets_names = ["df_cleaned", "df_cleaned_filtered", "df_mean", "df_med"]
+    data_sets = [df_cleaned, df_cleaned_filtered, df_mean, df_med]
 
-    # podział na zbiory testowe i treningowe
-    X_train, X_test, y_train, y_test = train_test_split(X.values, y.values, test_size=0.25, random_state=5)
-    y_train = y_train.ravel()
-    y_test = y_test.ravel()
+    for index in range(len(data_sets)):
+        print('\n----------------------\nData set name:', data_sets_names[index])
+        # inicjacja X i y
+        inputs = data_sets[index]
+        X, y = prep_dataset(inputs)
 
-    # siec neuronowa
-    alg.neural_network(X_train, X_test, y_train, y_test, X, y)
+        # podział na zbiory testowe i treningowe
+        X_train, X_test, y_train, y_test = train_test_split(X.values, y.values, test_size=0.25)
+        y_train = y_train.ravel()
+        y_test = y_test.ravel()
 
-    # Drzewo regresyjne
-    alg.decision_tree_regressor(X_train, X_test, y_train, y_test, X, y)
+        # siec neuronowa
+        alg.neural_network(X_train, X_test, y_train, y_test, X, y)
 
-    # regresja liniowa
-    alg.linear_regression(X_train, X_test, y_train, y_test, X, y)
+        # Drzewo regresyjne
+        alg.decision_tree_regressor(X_train, X_test, y_train, y_test, X, y)
 
-    # regresja nieliniowa
-    alg.non_linear_regression(X_train, X_test, y_train, y_test, X, y)
+        # regresja liniowa
+        alg.linear_regression(X_train, X_test, y_train, y_test, X, y)
+
+        # regresja nieliniowa
+        alg.non_linear_regression(X_train, X_test, y_train, y_test, X, y)
 
 
 def prep_data():
@@ -84,7 +90,7 @@ def prep_dataset(df):
     return X, y
 
 
-def future_selector(X, y):
+def feature_selector(X, y):
     """
     Metoda odpowiedzialna za głosowanie za kolumnami, które posiadają
     odpowiednią korelację pomiędzy sobą.
@@ -100,16 +106,14 @@ def future_selector(X, y):
     :return
         Nazwy kolumn wybrane w wyniku głosowań.
     :
-
-    TODO ogarnac w ogole co robi fit_transform
     """
 
-    f_selector = SelectKBest(score_func=f_regression, k=30)
+    f_selector = SelectKBest(score_func=f_regression, k=25)
     X_selected = f_selector.fit_transform(X.values, y.values.ravel())
     X_selected_df = pd.DataFrame(X_selected, columns=[X.columns[i] for i in range(len(X.columns)) if
                                                       f_selector.get_support()[i]])
 
-    f_selector2 = SelectKBest(score_func=mutual_info_regression, k=30)
+    f_selector2 = SelectKBest(score_func=mutual_info_regression, k=25)
     X_selected2 = f_selector2.fit_transform(X.values, y.values.ravel())
     X_selected2_df = pd.DataFrame(X_selected2, columns=[X.columns[i] for i in range(len(X.columns)) if
                                                         f_selector2.get_support()[i]])

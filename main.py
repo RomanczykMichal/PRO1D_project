@@ -14,7 +14,6 @@ def main():
     # future selector
     X_temp, y_temp = prep_dataset(df_cleaned)
     column_names = feature_selector(X_temp, y_temp)
-    # wypisać column names
     print(column_names)
     column_names = np.append(column_names, 'ViolentCrimesPerPop')
     df_cleaned_filtered = df_cleaned[column_names]
@@ -49,19 +48,16 @@ def main():
         alg.random_forest_regressor(X_train, X_test, y_train, y_test, X, y)
 
 
-        # Random Search Cross Validation-pomaga znaleźć nalepsze ustawienia dla modelu
-        # Nie odpalać bo trwa jakieś 15min
-        # wyniki df_clean: {'n_estimators': 1400, 'min_samples_split': 2, 'min_samples_leaf': 4, 'max_features': 'sqrt', 'max_depth': 80, 'bootstrap': False}
-        # wyniki df_clean_filtered: {'n_estimators': 2000, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 20, 'bootstrap': True}
-        # alg.random_forest_hyperparameter(X_train, X_test, y_train, y_test, X, y)
-
-        # sieci neuronowe random search cv
-        # alg.neural_network_parameter_search(X_train, y_train)
-
+def find_parameters(X_train, y_train):
+    """
+        Random Search Cross Validation. Pomaga znaleźć nalepsze ustawienia dla modelu
+    """
+    alg.random_forest_parameter_search(X_train, y_train)
+    alg.neural_network_parameter_search(X_train, y_train)
 
 def prep_data():
     """
-    Metoda odpowiedzialna za pobranie i wstępne przygotowanie danych.
+        Metoda odpowiedzialna za pobranie i wstępne przygotowanie danych.
 
     :return
         df_original -> DataFrame z oryginalnymi wartościami z pliku źródłowego
@@ -107,8 +103,8 @@ def prep_dataset(df):
 
 def feature_selector(X, y):
     """
-    Metoda odpowiedzialna za głosowanie za kolumnami, które posiadają
-    odpowiednią korelację pomiędzy sobą.
+        Metoda odpowiedzialna za głosowanie za kolumnami, które posiadają
+        odpowiednią korelację pomiędzy sobą.
 
     :param X
         Kolumny z wartosciami input

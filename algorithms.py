@@ -13,6 +13,7 @@ from sklearn.model_selection import RandomizedSearchCV
 import random
 from sklearn.linear_model import RANSACRegressor
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
 
 
 
@@ -64,8 +65,9 @@ def linear_regression(X_train, X_test, y_train, y_test, X, y):
 
         TODO dlaczego alpha 35?
     """
-    model_r = linear_model.Ridge(alpha=1)
+    # model_r = linear_model.Ridge(alpha=1)
     # model_r.fit(X_train, y_train)
+    model_r = LinearRegression()
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
     scores2 = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='r2')
 

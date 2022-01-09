@@ -7,6 +7,7 @@ from sklearn import metrics
 from sklearn import tree
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
+from sklearn.ensemble import RandomForestRegressor
 
 
 def neural_network(X_train, X_test, y_train, y_test, X, y):
@@ -78,3 +79,15 @@ def non_linear_regression(X_train, X_test, y_train, y_test, X, y):
 
     print('\nNon-Linear regression score:', model_r.score(X_test, y_test))
     print('Non-Linear regression cross-validation mean score is: ', scores.mean(), scores.std())
+
+
+def random_forest_regressor(X_train, X_test, y_train, y_test, X, y):
+    """
+        Sources:
+            https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+        """
+    model_r = RandomForestRegressor(max_depth=20)
+    model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    print('\nRandom Forest Regression score:', model_r.score(X_test, y_test))
+    print('Random Forest Regression cross-validation mean score is: ', scores.mean(), scores.std())

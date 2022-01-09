@@ -43,6 +43,9 @@ def main():
         # regresja nieliniowa
         alg.non_linear_regression(X_train, X_test, y_train, y_test, X, y)
 
+        # Las regresyjny
+        alg.random_forest_regressor(X_train, X_test, y_train, y_test, X, y)
+
 
 def prep_data():
     """

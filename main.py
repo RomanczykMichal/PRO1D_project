@@ -14,6 +14,8 @@ def main():
     # future selector
     X_temp, y_temp = prep_dataset(df_cleaned)
     column_names = feature_selector(X_temp, y_temp)
+    # wypisać column names
+    print(column_names)
     column_names = np.append(column_names, 'ViolentCrimesPerPop')
     df_cleaned_filtered = df_cleaned[column_names]
 
@@ -46,8 +48,6 @@ def main():
         # Las regresyjny
         alg.random_forest_regressor(X_train, X_test, y_train, y_test, X, y)
 
-        # RANSAC
-        # alg.random_sample_consensus(X_train, X_test, y_train, y_test, X, y)
 
         # Random Search Cross Validation-pomaga znaleźć nalepsze ustawienia dla modelu
         # Nie odpalać bo trwa jakieś 15min

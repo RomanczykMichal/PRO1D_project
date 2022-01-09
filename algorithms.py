@@ -12,6 +12,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 import random
 from sklearn.linear_model import RANSACRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
 
 
 def neural_network(X_train, X_test, y_train, y_test, X, y):
@@ -23,13 +25,14 @@ def neural_network(X_train, X_test, y_train, y_test, X, y):
         scores - tablica wyników z cross-validation.
         cross_val_model - cv=5 to tyle razy odpalane jest uczenie.
     """
-    model_r = MLPRegressor(hidden_layer_sizes=(44, 49, 7), activation='logistic', alpha=0.0001, learning_rate_init=0.001,
+    model_r = MLPRegressor(hidden_layer_sizes=(90, 40, 10), activation='logistic', alpha=0.001, learning_rate_init=0.001,
                            learning_rate='adaptive', solver='adam', max_iter=10000, early_stopping=True, verbose=False)
-    model_r.fit(X_train, y_train)
-    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    # model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
+    scores2 = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='r2')
 
-    print('Neural network score:', model_r.score(X_test, y_test))
-    print('Neural network cross-validation mean score is: ', scores.mean(), scores.std())
+    print('Neural network cross-validation mean score mse is: ', scores.mean(), scores.std())
+    print('Neural network cross-validation mean score r2 is: ', scores2.mean(), scores2.std())
 
 
 def decision_tree_regressor(X_train, X_test, y_train, y_test, X, y):
@@ -40,11 +43,13 @@ def decision_tree_regressor(X_train, X_test, y_train, y_test, X, y):
         TODO Dziwnie duze wyniki wychodza :)
     """
     model_r = DecisionTreeRegressor()
-    reg = model_r.fit(X_train, y_train)
-    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    # model_r.fit(X_train, y_train)
 
-    print('\nDecision tree regressor score:', model_r.score(X_test, y_test))
-    print('Decision tree cross-validation mean score is: ', scores.mean(), scores.std())
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
+    scores2 = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='r2')
+
+    print('Decision tree cross-validation mean score mse is: ', scores.mean(), scores.std())
+    print('Decision tree cross-validation mean score r2 is: ', scores2.mean(), scores2.std())
 
     # plt.figure()
     # plot_tree(reg, filled=True)
@@ -60,11 +65,12 @@ def linear_regression(X_train, X_test, y_train, y_test, X, y):
         TODO dlaczego alpha 35?
     """
     model_r = linear_model.Ridge(alpha=1)
-    model_r.fit(X_train, y_train)
-    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    # model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
+    scores2 = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='r2')
 
-    print('\nLinear regression score:', model_r.score(X_test, y_test))
-    print('Linear regression cross-validation mean score is: ', scores.mean(), scores.std())
+    print('Linear regression cross-validation mean score mse is: ', scores.mean(), scores.std())
+    print('Linear regression cross-validation mean score r2 is: ', scores2.mean(), scores2.std())
 
 
 def non_linear_regression(X_train, X_test, y_train, y_test, X, y):
@@ -78,11 +84,12 @@ def non_linear_regression(X_train, X_test, y_train, y_test, X, y):
              w tych artykulach to niby powinno sie zgadzac
     """
     model_r = SVR()
-    model_r.fit(X_train, y_train)
-    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    # model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
+    scores2 = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='r2')
 
-    print('\nNon-Linear regression score:', model_r.score(X_test, y_test))
-    print('Non-Linear regression cross-validation mean score is: ', scores.mean(), scores.std())
+    print('Non-Linear regression cross-validation mean score mse is: ', scores.mean(), scores.std())
+    print('Non-Linear regression cross-validation mean score r2 is: ', scores2.mean(), scores2.std())
 
 
 def random_forest_regressor(X_train, X_test, y_train, y_test, X, y):
@@ -91,20 +98,22 @@ def random_forest_regressor(X_train, X_test, y_train, y_test, X, y):
             https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
         """
     model_r = RandomForestRegressor(n_estimators=2000, min_samples_split=2, min_samples_leaf=2, max_features='sqrt', max_depth=20, bootstrap=True)
-    model_r.fit(X_train, y_train)
-    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
-    print('\nRandom Forest Regression score:', model_r.score(X_test, y_test))
-    print('Random Forest Regression cross-validation mean score is: ', scores.mean(), scores.std())
+    # model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
+    scores2 = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='r2')
+
+    print('Random Forest Regression cross-validation mean score mse is: ', scores.mean(), scores.std())
+    print('Random Forest Regression cross-validation mean score r2 is: ', scores2.mean(), scores2.std())
 
 
-def random_sample_consensus(X_train, X_test, y_train, y_test, X, y):
+def gradient_boosting_regressor(X_train, X_test, y_train, y_test, X, y):
     """
     Sources:
         https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
     """
-    model_r = RANSACRegressor(random_state=0, )
-    model_r.fit(X_train, y_train)
-    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    model_r = GradientBoostingRegressor(random_state=0)
+    # model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=10, scoring='neg_mean_squared_error')
     print('\nRANSAC score:', model_r.score(X_test, y_test))
     print('RANSAC cross-validation mean score is: ', scores.mean(), scores.std())
 

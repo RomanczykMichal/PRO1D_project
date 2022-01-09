@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn import linear_model
 from sklearn.neural_network import MLPRegressor
 from sklearn.tree import DecisionTreeRegressor
@@ -8,6 +9,9 @@ from sklearn import tree
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RandomizedSearchCV
+import random
+from sklearn.linear_model import RANSACRegressor
 
 
 def neural_network(X_train, X_test, y_train, y_test, X, y):
@@ -19,8 +23,8 @@ def neural_network(X_train, X_test, y_train, y_test, X, y):
         scores - tablica wyników z cross-validation.
         cross_val_model - cv=5 to tyle razy odpalane jest uczenie.
     """
-    model_r = MLPRegressor(hidden_layer_sizes=(20,), activation='logistic', alpha=0.1, learning_rate_init=0.1,
-                           learning_rate='adaptive', solver='sgd', max_iter=10000, early_stopping=True, verbose=False)
+    model_r = MLPRegressor(hidden_layer_sizes=(44, 49, 7), activation='logistic', alpha=0.0001, learning_rate_init=0.001,
+                           learning_rate='adaptive', solver='adam', max_iter=10000, early_stopping=True, verbose=False)
     model_r.fit(X_train, y_train)
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
 
@@ -86,8 +90,75 @@ def random_forest_regressor(X_train, X_test, y_train, y_test, X, y):
         Sources:
             https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
         """
-    model_r = RandomForestRegressor(max_depth=20)
+    model_r = RandomForestRegressor(n_estimators=2000, min_samples_split=2, min_samples_leaf=2, max_features='sqrt', max_depth=20, bootstrap=True)
     model_r.fit(X_train, y_train)
     scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
     print('\nRandom Forest Regression score:', model_r.score(X_test, y_test))
     print('Random Forest Regression cross-validation mean score is: ', scores.mean(), scores.std())
+
+
+def random_sample_consensus(X_train, X_test, y_train, y_test, X, y):
+    """
+    Sources:
+        https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+    """
+    model_r = RANSACRegressor(random_state=0, )
+    model_r.fit(X_train, y_train)
+    scores = cross_val_score(model_r, X.values, y.values.ravel(), cv=5, scoring='r2')
+    print('\nRANSAC score:', model_r.score(X_test, y_test))
+    print('RANSAC cross-validation mean score is: ', scores.mean(), scores.std())
+
+
+def neural_network_parameter_search(X_train, y_train):
+    """
+    Sources
+        https://stackoverflow.com/questions/54735717/how-to-define-a-mlpr-with-two-hidden-layers-for-randomsearchcv
+
+    """
+    model_r = MLPRegressor(learning_rate='adaptive', max_iter=5000, random_state=42, early_stopping=True)
+    params = {
+        'activation':['logistic', 'relu', 'tanh'],
+        'alpha': [0.0001, 0.001, 0.01],
+        'hidden_layer_sizes':[(random.randrange(20,100), random.randrange(10,50), random.randrange(5,20)) for i in range(40)],
+        'solver':['sgd', 'adam']
+    }
+
+    model_r_random = RandomizedSearchCV(estimator=model_r, param_distributions=params, n_iter=120, cv=4, verbose=5, n_jobs=-1, random_state=42)
+    model_r_random.fit(X_train, y_train)
+    print(model_r_random.best_params_)
+    print(model_r_random.best_estimator_)
+
+
+def random_forest_parameter_search(X_train, X_test, y_train, y_test, X, y):
+
+    """
+    Sources:
+        https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74
+    """
+    # Hyper parameter tuning
+
+    # Number of trees in random forest
+    n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
+    # Number of features to consider at every split
+    max_features = ['auto', 'sqrt']
+    # Maximum number of levels in tree
+    max_depth = [int(x) for x in np.linspace(10, 110, num=11)]
+    max_depth.append(None)
+    # Minimum number of samples required to split a node
+    min_samples_split = [2, 5, 10]
+    # Minimum number of samples required at each leaf node
+    min_samples_leaf = [1, 2, 4]
+    # Method of selecting samples for training each tree
+    bootstrap = [True, False]
+
+    random_grid = {'n_estimators': n_estimators,
+                   'max_features': max_features,
+                   'max_depth': max_depth,
+                   'min_samples_split': min_samples_split,
+                   'min_samples_leaf': min_samples_leaf,
+                   'bootstrap': bootstrap}
+    rf = RandomForestRegressor()
+    rf_random = RandomizedSearchCV(estimator=rf, param_distributions=random_grid, n_iter=100, cv=3, verbose=2,
+                                   random_state=42, n_jobs=-1)
+    rf_random.fit(X_train, y_train)
+    print(rf_random.best_params_)

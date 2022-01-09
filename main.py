@@ -46,6 +46,18 @@ def main():
         # Las regresyjny
         alg.random_forest_regressor(X_train, X_test, y_train, y_test, X, y)
 
+        # RANSAC
+        # alg.random_sample_consensus(X_train, X_test, y_train, y_test, X, y)
+
+        # Random Search Cross Validation-pomaga znaleźć nalepsze ustawienia dla modelu
+        # Nie odpalać bo trwa jakieś 15min
+        # wyniki df_clean: {'n_estimators': 1400, 'min_samples_split': 2, 'min_samples_leaf': 4, 'max_features': 'sqrt', 'max_depth': 80, 'bootstrap': False}
+        # wyniki df_clean_filtered: {'n_estimators': 2000, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 20, 'bootstrap': True}
+        # alg.random_forest_hyperparameter(X_train, X_test, y_train, y_test, X, y)
+
+        # sieci neuronowe random search cv
+        # alg.neural_network_parameter_search(X_train, y_train)
+
 
 def prep_data():
     """
